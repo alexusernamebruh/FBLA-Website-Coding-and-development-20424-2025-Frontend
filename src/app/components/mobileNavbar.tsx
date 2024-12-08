@@ -216,17 +216,6 @@ export default function MobileNavbar({
                     View all employers
                   </div>
                 </MenuItem>
-                <MenuItem>
-                  <div
-                    className={`font-semibold text-red-500 hover:bg-red-50 hover:cursor-pointer block px-4 py-2 text-sm`}
-                    onClick={() => {
-                      localStorage.removeItem('employer');
-                      router.push('/employer/login');
-                    }}
-                  >
-                    Logout
-                  </div>
-                </MenuItem>
               </div>
             )}
           </MenuItems>

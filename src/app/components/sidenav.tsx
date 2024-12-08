@@ -191,7 +191,7 @@ export default function SideNav({
           </div>
         )}
       </div>
-
+        
       <div className='flex flex-col items-center mb-6 h-full space-y-2'>
         <div className='font-bold mt-auto'>
           {type === 'applicant' &&
