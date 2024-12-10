@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -78,7 +79,6 @@ export default function Home() {
   const [newEmployerEmail, setNewEmployerEmail] = useState('');
   const [newEmployerPhoneNumber, setNewEmployerPhoneNumber] = useState('');
   const [allEmployers, setAllEmployers] = useState<any>([]);
-  const [backPage, setBackPage] = useState('Pending Job Postings');
 
   const authenticate = async () => {
     const { data: response } = await a.post('/admin', { password: password });
@@ -97,7 +97,6 @@ export default function Home() {
     if (selectedPending.id === -1) {
       setSelectedPending(response[0]);
     }
-    console.log(response);
   };
 
   const getAcceptedJobPostings = async () => {
@@ -108,7 +107,6 @@ export default function Home() {
     if (selectedPending.id === -1) {
       setSelectedAccepted(response[0]);
     }
-    console.log(response);
   };
 
   const getDeclinedJobPostings = async () => {
@@ -119,7 +117,6 @@ export default function Home() {
     if (selectedPending.id === -1) {
       setSelectedDeclined(response[0]);
     }
-    console.log(response);
   };
 
   const approveJobPosting = async (jobPostingId: number) => {
@@ -128,6 +125,8 @@ export default function Home() {
     );
     if (response) {
       getPendingJobPostings();
+      getAcceptedJobPostings();
+      getDeclinedJobPostings();
       setApproveSuccess(true);
       const timer = setTimeout(() => {
         setApproveSuccess(false);
@@ -142,6 +141,9 @@ export default function Home() {
     );
     if (response) {
       getPendingJobPostings();
+      getPendingJobPostings();
+      getAcceptedJobPostings();
+      getDeclinedJobPostings();
       setDeclineSuccess(true);
       const timer = setTimeout(() => {
         setDeclineSuccess(false);
@@ -656,7 +658,7 @@ export default function Home() {
                     </div>
                     <div>
                       <label className='block text-sm/6 font-bold text-gray-900'>
-                        Email
+                        Email*
                       </label>
                       <div className='mt-2'>
                         <input
@@ -1161,7 +1163,7 @@ export default function Home() {
                       </div>
                       <div>
                         <label className='block text-sm/6 font-bold text-gray-900'>
-                          Email
+                          Email*
                         </label>
                         <div className='mt-2'>
                           <input

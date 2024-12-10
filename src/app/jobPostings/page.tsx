@@ -36,7 +36,7 @@ export default function Home() {
   const [applicantId, setApplicantId] = useState(-1);
   const [currentPage, setCurrentPage] = useState('All Postings');
   const [backPage, setBackPage] = useState('All Postings');
-  console.log(window.innerWidth);
+
   const [currentJobPosting, setCurrentJobPosting] = useState<{
     id: number;
     title: string;
@@ -81,8 +81,6 @@ export default function Home() {
     setJobPostings(response);
 
     setCurrentJobPosting(response[0]);
-
-    console.log(response);
   };
 
   const applyToJobPosting = async (jobPostingId: number) => {
@@ -93,7 +91,7 @@ export default function Home() {
     if (response) {
       const { data: response2 } = await a.get(`/jobPostings/${jobPostingId}`);
       setCurrentJobPosting(response2);
-      console.log(response2);
+
       getAppliedJobPostings();
     }
   };
@@ -103,6 +101,7 @@ export default function Home() {
     for (let i = 0; i < currentJobPosting?.applicants?.length; i++) {
       if (currentJobPosting?.applicants[i]?.id === applicantId) {
         isApplied = true;
+
         break;
       }
     }
@@ -119,13 +118,10 @@ export default function Home() {
     if (currentAppliedJobPosting?.id === -1) {
       setCurrentAppliedJobPosting(response.appliedPostings[0]);
     }
-
-    console.log(response);
   };
 
   const getFilteredJobPostings = async (titleFilter: string) => {
     const { data: response } = await a.get(`/jobPostings?title=${titleFilter}`);
-    console.log(response);
     setJobPostings(response);
   };
 
@@ -234,8 +230,7 @@ export default function Home() {
                     </p>
                     <div
                       onClick={() => {
-                        !checkIfApplied() &&
-                          applyToJobPosting(currentJobPosting.id);
+                        applyToJobPosting(currentJobPosting.id);
                       }}
                       className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${
                         checkIfApplied()
@@ -503,7 +498,7 @@ export default function Home() {
                       <div
                         onClick={() => {
                           setCurrentAppliedJobPosting(v);
-                          setCurrentPage('Selected');
+                          setCurrentPage('Selected Applied');
                           setBackPage('Applied Postings');
                         }}
                         className='shadow-sm group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white w-full h-fit rounded-lg border border-gray-300 px-8 py-6'
@@ -551,8 +546,88 @@ export default function Home() {
                     </p>
                     <div
                       onClick={() => {
-                        !checkIfApplied() &&
+                        if (!checkIfApplied) {
                           applyToJobPosting(currentJobPosting.id);
+                        }
+                      }}
+                      className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${
+                        checkIfApplied()
+                          ? 'bg-white border hover:cursor-not-allowed text-gray-600'
+                          : 'bg-blue-500 hover:cursor-pointer hover:bg-blue-600 text-white'
+                      } font-bold text-center`}
+                    >
+                      {checkIfApplied()
+                        ? 'Applied for this posting'
+                        : 'Apply for this posting'}
+                    </div>
+                  </div>
+                </div>
+                <div className=''>
+                  <div className='space-y-1 px-6 py-8 border-b'>
+                    <p className='text-lg font-bold'>Date created</p>
+                    <p className='text-sm text-gray-600'>
+                      On {dayjs(currentJobPosting?.createdAt).format('dddd')}
+                      {', '}
+                      {dayjs(currentJobPosting?.createdAt).format(
+                        'MM/DD/YYYY',
+                      )}{' '}
+                      at {dayjs(currentJobPosting?.createdAt).format('h:mm a')}
+                    </p>
+                  </div>
+                  <div className='space-y-1 px-6 py-8 border-b'>
+                    <p className='text-lg font-bold'>Employer Information</p>
+                    <p className='text-sm text-gray-600'>
+                      {currentJobPosting?.author?.companyName}
+                    </p>
+                    <p className='text-sm text-gray-600'>
+                      {currentJobPosting?.address === ''
+                        ? 'No address listed'
+                        : currentJobPosting?.address || 'No address listed'}
+                    </p>
+                    <p className='text-sm text-gray-600'>
+                      {currentJobPosting?.author?.email === ''
+                        ? 'No email listed'
+                        : currentJobPosting?.author?.email || 'No email listed'}
+                    </p>
+                    <p className='text-sm text-gray-600'>
+                      {currentJobPosting?.author?.phoneNumber === ''
+                        ? 'No phone number listed'
+                        : currentJobPosting?.author?.phoneNumber ||
+                          'No phone number listed'}
+                    </p>
+                  </div>
+                  <div className='space-y-1 px-6 py-8'>
+                    <p className='text-lg font-bold'>Full description</p>
+                    <p className='text-sm text-gray-600'>
+                      {currentJobPosting?.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {currentPage === 'Selected Applied' && (
+            <div className='flex flex-col space-y-2'>
+              <div
+                onClick={() => setCurrentPage(backPage)}
+                className='w-full h-fit hover:cursor-pointer hover:bg-gray-100 p-2 mb-2 text-center border rounded-lg border-gray-300 bg-white shadow-sm font-semibold text-sm'
+              >
+                Go Back
+              </div>
+              <div className='w-full h-full bg-white overflow-auto rounded-lg border border-gray-300 shadow-md'>
+                <div className='border-b h-fit'>
+                  <div className='px-6 py-6'>
+                    <p className='font-bold text-2xl'>
+                      {currentJobPosting?.title}
+                    </p>
+                    <p className='font-medium text-gray-600 mt-1 text-sm'>
+                      {currentJobPosting?.author?.companyName}
+                    </p>
+                    <div
+                      onClick={() => {
+                        if (!checkIfApplied) {
+                          applyToJobPosting(currentJobPosting.id);
+                        }
                       }}
                       className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${
                         checkIfApplied()

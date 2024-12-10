@@ -33,8 +33,7 @@ export default function Home() {
       email: email,
     });
     if (response) {
-      console.log(response);
-      localStorage.setItem('Applicant', response);
+      localStorage.setItem('Applicant', JSON.stringify(response));
       router.push('/jobPostings');
     }
   };
@@ -115,7 +114,7 @@ export default function Home() {
                           htmlFor='email'
                           className='block text-sm/6 font-bold text-gray-900'
                         >
-                          Email
+                          Email*
                         </label>
                       </div>
                       <div className='mt-2'>
@@ -243,7 +242,7 @@ export default function Home() {
                           htmlFor='email'
                           className='block text-sm/6 font-bold text-gray-900'
                         >
-                          Email
+                          Email*
                         </label>
                       </div>
                       <div className='mt-2'>

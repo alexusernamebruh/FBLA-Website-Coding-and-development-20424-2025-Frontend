@@ -1,10 +1,10 @@
 const navigation = {
   contact: [
-    { name: 'guidance_department@schooldistrict.org', href: '#' },
-    { name: '123-123-1234', href: '#' },
-    { name: 'Address', href: '#' },
-    { name: 'City', href: '#' },
-    { name: 'State', href: '#' },
+    { name: 'guidance_department@southwesternsd.org', href: '#' },
+    { name: '717-632-2500', href: '#' },
+    { name: '225 Bowman Road', href: '#' },
+    { name: 'Hanover', href: '#' },
+    { name: 'Pennsylvania', href: '#' },
   ],
 };
 

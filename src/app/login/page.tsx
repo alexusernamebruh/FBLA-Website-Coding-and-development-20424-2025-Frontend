@@ -28,7 +28,6 @@ export default function Home() {
       password: password,
     });
     if (response) {
-      console.log(response);
       localStorage.setItem('Applicant', JSON.stringify(response));
       router.push('/jobPostings');
     }

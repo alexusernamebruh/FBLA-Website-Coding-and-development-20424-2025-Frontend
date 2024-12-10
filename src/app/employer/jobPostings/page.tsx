@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { truncate } from '@/app/helpers';
 import { a } from '../../config';
 
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import MobileNavbar from '@/app/components/mobileNavbar';
 import SideNav from '@/app/components/sidenav';
 import dayjs from 'dayjs';
@@ -51,7 +50,6 @@ export default function Home() {
     setNewDescription('');
     setNewTitle('');
     if (response) {
-      console.log(response);
       setCreateSuccess(true);
       const timer = setTimeout(() => {
         setCreateSuccess(false);
@@ -70,8 +68,6 @@ export default function Home() {
     if (currentJobPosting.id === -1) {
       setCurrentJobPosting(response[0]);
     }
-
-    console.log(response);
   };
 
   const changeJobPostingStatus = async (status: string) => {
@@ -84,7 +80,6 @@ export default function Home() {
       );
       setCurrentJobPosting(response2);
       getJobPostings();
-      console.log(response2);
     }
   };
 
@@ -210,7 +205,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className=''>
+                  <div>
                     <div className='space-y-1 px-6 py-8 border-b'>
                       <p className='text-lg font-bold'>Date created</p>
                       <p className='text-sm text-gray-600'>
@@ -359,7 +354,7 @@ export default function Home() {
         <MobileNavbar
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          type={'applicant'}
+          type={'employer'}
         />
 
         <div className='flex flex-col space-y-4 bg-grid h-full w-full overflow-auto p-8'>
@@ -463,7 +458,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div className=''>
+                <div>
                   <div className='space-y-1 px-6 py-8 border-b'>
                     <p className='text-lg font-bold'>Date created</p>
                     <p className='text-sm text-gray-600'>

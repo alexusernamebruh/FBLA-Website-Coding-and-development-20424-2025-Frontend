@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import Navbar from './components/navbar';
-import { a } from './config';
+
 import Footer from './components/footer';
 
 export default function Home() {
@@ -18,13 +18,6 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const getJobPostings = async () => {
-    const { data: result } = await a.get('/jobPostings');
-    console.log(result);
-  };
-  useEffect(() => {
-    getJobPostings();
-  }, []);
   return (
     <>
       {windowWidth > 1023 && (
@@ -42,10 +35,10 @@ export default function Home() {
                       By the Guidance Department
                     </p>
                     <p className='font-bold text-md pt-4'>
-                      Search for job postings by local companies
+                      Search for job postings by local companies.
                     </p>
                     <p className='font-bold text-md'>
-                      Create an applicant account to apply for a job posting
+                      Create an applicant account to apply for a job posting.
                     </p>
                   </div>
 
@@ -67,7 +60,6 @@ export default function Home() {
             </div>
             <Footer />
           </div>
-          {/* Employers have to have their account created by the backend panel, so students can't just create an account */}
         </div>
       )}
       {windowWidth < 1024 && (
@@ -85,10 +77,10 @@ export default function Home() {
                       By the Guidance Department
                     </p>
                     <p className='font-bold text-md pt-4'>
-                      Search for job postings by local companies
+                      Search for job postings by local companies.
                     </p>
                     <p className='font-bold text-md'>
-                      Create an applicant account to apply for a job posting
+                      Create an applicant account to apply for a job posting.
                     </p>
                   </div>
 
@@ -111,7 +103,6 @@ export default function Home() {
             </div>
             <Footer />
           </div>
-          {/* Employers have to have their account created by the backend panel, so students can't just create an account */}
         </div>
       )}
     </>
