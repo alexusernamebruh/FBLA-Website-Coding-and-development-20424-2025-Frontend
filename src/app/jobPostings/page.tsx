@@ -5,13 +5,16 @@ import { a } from '../config';
 import SideNav from '../components/sidenav';
 import dayjs from 'dayjs';
 import MobileNavbar from '../components/mobileNavbar';
+import AIHelper from '../components/aiHelper';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { truncate } from '../helpers';
+import Modal from '../components/modal';
 
 export default function Home() {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState<number | null>(null);
 
   useEffect(() => {
+    setWindowWidth(window.innerWidth);
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -137,10 +140,11 @@ export default function Home() {
 
   return (
     <div>
+     
       {/* Desktop Starts here */}
       <div
         className={`bg-white h-screen w-full ${
-          windowWidth > 1023 ? 'flex' : 'hidden'
+          (windowWidth ?? 0) > 1023 ? 'flex' : 'hidden'
         }`}
       >
         <div className='bg-blue-500 w-fit'>
@@ -280,7 +284,7 @@ export default function Home() {
                   </div>
                   <div className='space-y-1 px-6 py-8'>
                     <p className='text-lg font-bold'>Full description</p>
-                    <p className='text-sm text-gray-600'>
+                    <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                       {currentJobPosting?.description}
                     </p>
                   </div>
@@ -394,12 +398,17 @@ export default function Home() {
                 </div>
                 <div className='space-y-1 px-6 py-8'>
                   <p className='text-lg font-bold'>Full description</p>
-                  <p className='text-sm text-gray-600'>
+                  <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                     {currentAppliedJobPosting?.description}
                   </p>
                 </div>
               </div>
             </div>
+          </div>
+        )}
+        {currentPage === 'Ai Helper' && (
+          <div className='h-screen w-full'>
+            <AIHelper userType={'APPLICANT'} />
           </div>
         )}
       </div>
@@ -408,7 +417,7 @@ export default function Home() {
       {/* Mobile Starts here */}
       <div
         className={`${
-          windowWidth < 1025 ? 'flex flex-col' : 'hidden'
+          (windowWidth ?? 0) < 1025 ? 'flex flex-col' : 'hidden'
         } h-screen`}
       >
         <MobileNavbar
@@ -598,7 +607,7 @@ export default function Home() {
                   </div>
                   <div className='space-y-1 px-6 py-8'>
                     <p className='text-lg font-bold'>Full description</p>
-                    <p className='text-sm text-gray-600'>
+                    <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                       {currentJobPosting?.description}
                     </p>
                   </div>
@@ -677,7 +686,7 @@ export default function Home() {
                   </div>
                   <div className='space-y-1 px-6 py-8'>
                     <p className='text-lg font-bold'>Full description</p>
-                    <p className='text-sm text-gray-600'>
+                    <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                       {currentJobPosting?.description}
                     </p>
                   </div>

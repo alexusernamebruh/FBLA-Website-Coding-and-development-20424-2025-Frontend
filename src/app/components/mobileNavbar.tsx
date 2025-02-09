@@ -83,6 +83,20 @@ export default function MobileNavbar({
                 </MenuItem>
                 <MenuItem>
                   <div
+                    className={`${
+                      currentPage === 'Ai Helper'
+                        ? ' text-gray-700 font-semibold'
+                        : 'text-gray-600 font-medium hover:cursor-pointer hover:bg-gray-100'
+                    } block px-4 py-2 text-sm`}
+                    onClick={() =>
+                      currentPage !== 'Ai Helper' && setCurrentPage('Ai Helper')
+                    }
+                  >
+                    Ai helper
+                  </div>
+                </MenuItem>
+                <MenuItem>
+                  <div
                     className={`font-semibold hover:bg-red-50 text-red-500 hover:cursor-pointer block px-4 py-2 text-sm`}
                     onClick={() => {
                       localStorage.removeItem('Applicant');

@@ -49,6 +49,7 @@ export default function Home() {
     setNewAddress('');
     setNewDescription('');
     setNewTitle('');
+    getJobPostings();
     if (response) {
       setCreateSuccess(true);
       const timer = setTimeout(() => {
@@ -243,7 +244,7 @@ export default function Home() {
                     </div>
                     <div className='space-y-1 px-6 py-8 border-b'>
                       <p className='text-lg font-bold'>Full description</p>
-                      <p className='text-sm text-gray-600 whitespace-pre-wrap'>
+                      <p className='text-sm  text-gray-600 whitespace-pre-wrap'>
                         {currentJobPosting?.description}
                       </p>
                     </div>

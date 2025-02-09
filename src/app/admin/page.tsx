@@ -370,7 +370,7 @@ export default function Home() {
                       </div>
                       <div className='space-y-1 px-6 py-8'>
                         <p className='text-lg font-bold'>Full description</p>
-                        <p className='text-sm text-gray-600'>
+                        <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                           {selectedPending?.description}
                         </p>
                       </div>
@@ -478,7 +478,7 @@ export default function Home() {
                       </div>
                       <div className='space-y-1 px-6 py-8'>
                         <p className='text-lg font-bold'>Full description</p>
-                        <p className='text-sm text-gray-600'>
+                        <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                           {selectedAccepted?.description}
                         </p>
                       </div>
@@ -586,7 +586,7 @@ export default function Home() {
                       </div>
                       <div className='space-y-1 px-6 py-8'>
                         <p className='text-lg font-bold'>Full description</p>
-                        <p className='text-sm text-gray-600'>
+                        <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                           {selectedDeclined?.description}
                         </p>
                       </div>
@@ -850,7 +850,7 @@ export default function Home() {
                     </div>
                     <div className='space-y-1 px-6 py-8'>
                       <p className='text-lg font-bold'>Full description</p>
-                      <p className='text-sm text-gray-600'>
+                      <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                         {selectedPending?.description}
                       </p>
                     </div>
@@ -970,7 +970,7 @@ export default function Home() {
                     </div>
                     <div className='space-y-1 px-6 py-8'>
                       <p className='text-lg font-bold'>Full description</p>
-                      <p className='text-sm text-gray-600'>
+                      <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                         {selectedAccepted?.description}
                       </p>
                     </div>
@@ -1090,7 +1090,7 @@ export default function Home() {
                     </div>
                     <div className='space-y-1 px-6 py-8'>
                       <p className='text-lg font-bold'>Full description</p>
-                      <p className='text-sm text-gray-600'>
+                      <p className='text-sm text-gray-600 whitespace-pre-wrap'>
                         {selectedDeclined?.description}
                       </p>
                     </div>

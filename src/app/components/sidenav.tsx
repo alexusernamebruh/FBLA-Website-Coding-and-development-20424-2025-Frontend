@@ -1,5 +1,6 @@
 import {
   BriefcaseIcon,
+  ChatBubbleLeftEllipsisIcon,
   CheckBadgeIcon,
   EnvelopeIcon,
   PlusCircleIcon,
@@ -57,6 +58,23 @@ export default function SideNav({
                 <EnvelopeIcon />
               </div>
               <p>Applied Postings</p>
+            </div>
+            <div
+              className={`${
+                current == 'Ai Helper'
+                  ? 'bg-blue-600 hover:cursor-pointer space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+                  : 'bg-blue-500 hover:cursor-pointer text-blue-200 hover:text-white hover:bg-blue-600 space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+              }`}
+              onClick={() => {
+                if (current !== 'Ai Helper') {
+                  setCurrent('Ai Helper');
+                }
+              }}
+            >
+              <div className='w-5 h-5'>
+                <ChatBubbleLeftEllipsisIcon />
+              </div>
+              <p>Ai Helper</p>
             </div>
           </div>
         )}
@@ -191,7 +209,7 @@ export default function SideNav({
           </div>
         )}
       </div>
-        
+
       <div className='flex flex-col items-center mb-6 h-full space-y-2'>
         <div className='font-bold mt-auto'>
           {type === 'applicant' &&

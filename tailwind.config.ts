@@ -17,5 +17,5 @@ export default {
       xs: '300px',
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 } satisfies Config;
