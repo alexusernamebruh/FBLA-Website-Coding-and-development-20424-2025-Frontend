@@ -14,6 +14,32 @@ export interface IJobPosting {
   }[];
   postingStatus: string;
   status: string;
+  applications: IApplication[];
+}
+
+export interface IApplication {
+  id: number;
+  applicant: IApplicant;
+  applicantId: number;
+  jobPosting: IJobPosting;
+  jobPostingId: number;
+  resumeData: Blob | undefined | null;
+  age: number;
+  previousExperience: string;
+  wageExpectation: string;
+  availability: string;
+  resumeName: string;
+  createdAt: string;
+}
+
+export interface IApplicant {
+  id: number;
+  email: string | null;
+  fullname: string;
+  username: string;
+  phoneNumber: string | null;
+  password: string;
+  applications: IApplication[];
 }
 
 export interface IChat {

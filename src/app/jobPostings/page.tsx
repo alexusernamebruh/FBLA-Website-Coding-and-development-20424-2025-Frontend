@@ -6,7 +6,10 @@ import SideNav from '../components/sidenav';
 import dayjs from 'dayjs';
 import MobileNavbar from '../components/mobileNavbar';
 import AIHelper from '../components/aiHelper';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {
+  DocumentTextIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 import { truncate } from '../helpers';
 import Modal from '../components/modal';
 
@@ -39,6 +42,10 @@ export default function Home() {
   const [applicantId, setApplicantId] = useState(-1);
   const [currentPage, setCurrentPage] = useState('All Postings');
   const [backPage, setBackPage] = useState('All Postings');
+  const [age, setAge] = useState<number | string>('');
+  const [wageExpectation, setWageExpectation] = useState('');
+  const [availability, setAvailability] = useState('');
+  const [previousExperience, setPreviousExperience] = useState('');
 
   const [currentJobPosting, setCurrentJobPosting] = useState<{
     id: number;
@@ -78,6 +85,11 @@ export default function Home() {
 
   const [appliedJobPostings, setAppliedJobPostings] = useState([]);
 
+  const [showApplication, setShowApplication] = useState(false);
+
+  const [resume, setResume] = useState<File | null>(null);
+  const [resumeName, setResumeName] = useState('');
+
   const getOpenJobPostings = async () => {
     const { data: response } = await a.get(`/jobPostings`);
 
@@ -97,8 +109,31 @@ export default function Home() {
 
       getAppliedJobPostings();
     }
-  };
 
+    if (resume) {
+      setShowApplication(false);
+
+      const { data: response2 } = await a.post(
+        '/jobPostings/createApplication',
+        {
+          age: age,
+          previousExperience: previousExperience,
+          wageExpectation: wageExpectation,
+          availability: availability,
+          applicantId: applicantId,
+          jobPostingId: currentJobPosting?.id,
+          resumeName: resumeName,
+        },
+      );
+
+      if (response2) {
+        const formData = new FormData();
+        formData.append('resumeData', resume);
+        await a.put(`/jobPostings/uploadResume/${response2?.id}`, formData);
+      }
+    }
+  };
+  //still have mobile left to do
   const checkIfApplied = () => {
     let isApplied = false;
     for (let i = 0; i < currentJobPosting?.applicants?.length; i++) {
@@ -128,6 +163,12 @@ export default function Home() {
     setJobPostings(response);
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0] || null;
+    setResume(selectedFile);
+    setResumeName(selectedFile?.name || '');
+  };
+
   useEffect(() => {
     setApplicantId(+JSON.parse(localStorage.getItem('Applicant')!).applicantId);
     getOpenJobPostings();
@@ -140,7 +181,97 @@ export default function Home() {
 
   return (
     <div>
-     
+      <Modal open={showApplication} setOpen={setShowApplication}>
+        <div className='w-full'>
+          <div className='flex flex-col p-4 space-y-4'>
+            <div className='text-center text-xl font-bold'>
+              Apply to "{currentJobPosting.title}""
+            </div>
+            <div className='flex flex-col space-y-4'>
+              <div className='flex flex-col space-y-2'>
+                <label className='font-semibold'>Age</label>
+                <input
+                  type='number'
+                  onChange={(v) => setAge(v.target.value)}
+                  value={age}
+                  className='border border-gray-300 rounded-md p-2'
+                />
+              </div>
+              <div className='flex flex-col space-y-2'>
+                <label className='font-semibold'>Wage Expectation</label>
+                <input
+                  onChange={(v) => setWageExpectation(v.target.value)}
+                  value={wageExpectation}
+                  type='text'
+                  className='border border-gray-300 rounded-md p-2'
+                />
+              </div>
+              <div className='flex flex-col space-y-2'>
+                <label className='font-semibold'>
+                  Previous Experience(if any)
+                </label>
+                <textarea
+                  onChange={(v) => setPreviousExperience(v.target.value)}
+                  value={previousExperience}
+                  className='border border-gray-300 rounded-md p-2'
+                  rows={5}
+                />
+              </div>
+              <div className='flex flex-col space-y-2'>
+                <label className='font-semibold'>Availability</label>
+                <textarea
+                  onChange={(v) => setAvailability(v.target.value)}
+                  value={availability}
+                  className='border border-gray-300 rounded-md p-2'
+                  rows={5}
+                />
+              </div>
+              <div className='flex flex-col space-y-2'>
+                <label className='font-semibold'>Resume</label>
+                <div className='w-full py-9 bg-gray-50 rounded-2xl border border-gray-300 gap-3 grid border-dashed'>
+                  <div className='grid gap-1'>
+                    <div className='w-12 bg-blue-100 p-2.5 rounded-full h-12 text-blue-500 mx-auto'>
+                      <DocumentTextIcon />
+                    </div>
+                    <h2 className='text-center text-gray-400 text-xs'>
+                      PDF only
+                    </h2>
+                  </div>
+                  <div className='grid gap-2'>
+                    <h4 className='text-center text-gray-900 text-sm font-medium'>
+                      Drag and Drop your file here or
+                    </h4>
+                    <div className='flex items-center justify-center'>
+                      <label>
+                        <input
+                          onChange={handleFileChange}
+                          type='file'
+                          accept='.pdf'
+                          hidden
+                        />
+                        <div className='flex w-28 h-9 px-2 flex-col bg-blue-500 rounded-full shadow text-white text-xs font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none'>
+                          Choose File
+                        </div>
+                      </label>
+                    </div>
+                    {resumeName !== '' && (
+                      <p className='text-sm text-center'>{resumeName}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div
+                onClick={() => {
+                  applyToJobPosting(currentJobPosting.id);
+                }}
+                className='w-fit hover:cursor-pointer h-fit px-4 py-2 mt-4 rounded-md bg-blue-500 hover:bg-blue-600 text-white font-bold text-center'
+              >
+                Submit Application
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal>
       {/* Desktop Starts here */}
       <div
         className={`bg-white h-screen w-full ${
@@ -234,7 +365,7 @@ export default function Home() {
                     </p>
                     <div
                       onClick={() => {
-                        applyToJobPosting(currentJobPosting.id);
+                        setShowApplication(true);
                       }}
                       className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${
                         checkIfApplied()
@@ -317,7 +448,7 @@ export default function Home() {
                     <div key={i} className='group'>
                       <div
                         onClick={() => setCurrentAppliedJobPosting(v)}
-                        className='shadow-sm w-fit group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white w-full h-fit rounded-lg border border-gray-300 px-8 py-6'
+                        className='shadow-sm w-fit group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white h-fit rounded-lg border border-gray-300 px-8 py-6'
                       >
                         <div className='group-hover:cursor-pointer'>
                           <p className='font-bold group-hover:underline'>
@@ -556,7 +687,7 @@ export default function Home() {
                     <div
                       onClick={() => {
                         if (!checkIfApplied) {
-                          applyToJobPosting(currentJobPosting.id);
+                          setShowApplication(true);
                         }
                       }}
                       className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${
@@ -635,7 +766,7 @@ export default function Home() {
                     <div
                       onClick={() => {
                         if (!checkIfApplied) {
-                          applyToJobPosting(currentJobPosting.id);
+                          setShowApplication(true);
                         }
                       }}
                       className={`w-fit h-fit px-4 py-2 mt-4 rounded-md ${

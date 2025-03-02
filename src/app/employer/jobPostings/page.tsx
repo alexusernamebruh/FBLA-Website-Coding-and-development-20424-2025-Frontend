@@ -7,8 +7,10 @@ import MobileNavbar from '@/app/components/mobileNavbar';
 import SideNav from '@/app/components/sidenav';
 import dayjs from 'dayjs';
 import Success from '@/app/components/success';
-import { IJobPosting } from '@/app/interfaces';
-
+import { IApplication, IJobPosting } from '@/app/interfaces';
+import Modal from '@/app/components/modal';
+import { Document, Page, pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [currentPage, setCurrentPage] = useState('Created Postings');
@@ -27,8 +29,13 @@ export default function Home() {
     applicants: [],
     postingStatus: 'OPEN',
     status: 'PENDING',
+    applications: [],
   });
   const [backPage, setBackPage] = useState('Created Postings');
+  const [showApplication, setShowApplication] = useState(false);
+  const [selectedApplication, setSelectedApplication] =
+    useState<IApplication | null>(null);
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -97,6 +104,80 @@ export default function Home() {
           show={createSuccess}
           setShow={setCreateSuccess}
         />
+      </div>
+      <div>
+        <Modal open={showApplication} setOpen={setShowApplication}>
+          <div className='flex flex-col space-y-5 p-4 w-96'>
+            <p className='text-xl font-semibold mb-1'>Application</p>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Full Name</p>
+              <p className='text-sm text-gray-700'>
+                {selectedApplication?.applicant.fullname}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Email</p>
+              <p className='text-sm text-gray-700'>
+                {selectedApplication?.applicant.email || 'No email listed'}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Phone number</p>
+              <p className='text-sm text-gray-700'>
+                {selectedApplication?.applicant.phoneNumber ||
+                  'No phone number listed'}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Age</p>
+              <p className='text-sm text-gray-700'>
+                {selectedApplication?.age} years old
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Wage Expectation</p>
+              <p className='text-sm text-gray-700'>
+                {selectedApplication?.wageExpectation}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Previous Experience</p>
+              <p className='text-sm text-gray-700 whitespace-pre-wrap'>
+                {selectedApplication?.previousExperience}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Availability</p>
+              <p className='text-sm text-gray-700 whitespace-pre-wrap'>
+                {selectedApplication?.availability}
+              </p>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Resume</p>
+              <div>
+                {/* <Document
+                  file={
+                    selectedApplication?.resumeData
+                      ? URL.createObjectURL(
+                          //@ts-expect-error idk
+                          selectedApplication.resumeData,
+                        )
+                      : undefined
+                  }
+                >
+                  <Page pageNumber={1} />
+                </Document> */}
+                {typeof selectedApplication?.resumeData}
+              </div>
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Application Creation Date</p>
+              <p className='text-sm text-gray-700 whitespace-pre-wrap'>
+                {dayjs(selectedApplication?.createdAt).format('MM/DD/YYYY')}
+              </p>
+            </div>
+          </div>
+        </Modal>
       </div>
 
       {/* Desktop Starts here */}
@@ -251,15 +332,22 @@ export default function Home() {
                     <div className='space-y-1 px-6 py-8'>
                       <p className='text-lg font-bold mb-2'>Applications</p>
                       <div className='grid grid-cols-2 gap-x-2'>
-                        {currentJobPosting?.applicants?.length ? (
-                          currentJobPosting?.applicants?.map((v, i) => (
+                        {currentJobPosting?.applications?.length ? (
+                          currentJobPosting?.applications?.map((v, i) => (
                             <div
                               key={i}
-                              className='bg-white border border-gray-300 p-4 flex flex-col space-y-1 rounded-md font-medium text-gray-600 text-xs'
+                              onClick={() => {
+                                setSelectedApplication(v);
+                                setShowApplication(true);
+                              }}
+                              className='bg-white hover:bg-gray-100 hover:cursor-pointer border border-gray-300 p-4 flex flex-col space-y-1 rounded-md font-medium text-gray-600 text-xs'
                             >
-                              <p>{v.fullname}</p>
-                              <p>{v.email || 'No email listed'}</p>
-                              <p>{v.phoneNumber || 'No phone number listed'}</p>
+                              <p>{v.applicant.fullname}</p>
+                              <p>{v.applicant.email || 'No email listed'}</p>
+                              <p>
+                                {v.applicant.phoneNumber ||
+                                  'No phone number listed'}
+                              </p>
                             </div>
                           ))
                         ) : (
