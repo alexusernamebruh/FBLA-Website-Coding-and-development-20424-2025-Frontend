@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { truncate } from '@/app/helpers';
+import { bufferToBlob, downloadBlob, truncate } from '@/app/helpers';
 import { a } from '../../config';
 
 import MobileNavbar from '@/app/components/mobileNavbar';
@@ -10,7 +10,12 @@ import Success from '@/app/components/success';
 import { IApplication, IJobPosting } from '@/app/interfaces';
 import Modal from '@/app/components/modal';
 import { Document, Page, pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [currentPage, setCurrentPage] = useState('Created Postings');
@@ -107,7 +112,7 @@ export default function Home() {
       </div>
       <div>
         <Modal open={showApplication} setOpen={setShowApplication}>
-          <div className='flex flex-col space-y-5 p-4 w-96'>
+          <div className='flex flex-col space-y-5 p-4 w-full min-w-96'>
             <p className='text-xl font-semibold mb-1'>Application</p>
             <div className='flex flex-col'>
               <p className='font-semibold'>Full Name</p>
@@ -153,21 +158,24 @@ export default function Home() {
               </p>
             </div>
             <div className='flex flex-col'>
-              <p className='font-semibold'>Resume</p>
-              <div>
-                {/* <Document
-                  file={
-                    selectedApplication?.resumeData
-                      ? URL.createObjectURL(
-                          //@ts-expect-error idk
-                          selectedApplication.resumeData,
-                        )
-                      : undefined
-                  }
+              <p className='font-semibold'>Resume(Preview)</p>
+              <div className=''>
+                <div className=''>
+                  <Document file={selectedApplication?.resumeData}>
+                    <Page pageNumber={1} />
+                  </Document>
+                </div>
+                <div
+                  onClick={() => {
+                    downloadBlob(
+                      bufferToBlob(selectedApplication?.resumeData),
+                      selectedApplication?.resumeName || 'resume.pdf',
+                    );
+                  }}
+                  className='py-3 px-4 rounded-md w-fit text-white font-semibold bg-blue-500 hover:bg-blue-600 hover:cursor-pointer'
                 >
-                  <Page pageNumber={1} />
-                </Document> */}
-                {typeof selectedApplication?.resumeData}
+                  Download Resume
+                </div>
               </div>
             </div>
             <div className='flex flex-col'>

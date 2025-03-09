@@ -13,6 +13,7 @@
     "@fontsource/tinos": "^5.1.0",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@react-pdf/renderer": "^4.2.2",
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
     "next": "15.0.3",

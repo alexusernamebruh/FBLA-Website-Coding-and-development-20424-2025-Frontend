@@ -23,7 +23,7 @@ export interface IApplication {
   applicantId: number;
   jobPosting: IJobPosting;
   jobPostingId: number;
-  resumeData: Blob | undefined | null;
+  resumeData: string;
   age: number;
   previousExperience: string;
   wageExpectation: string;

@@ -185,7 +185,7 @@ export default function Home() {
         <div className='w-full'>
           <div className='flex flex-col p-4 space-y-4'>
             <div className='text-center text-xl font-bold'>
-              Apply to "{currentJobPosting.title}""
+              Apply to &quot;{currentJobPosting.title}&quot;
             </div>
             <div className='flex flex-col space-y-4'>
               <div className='flex flex-col space-y-2'>
