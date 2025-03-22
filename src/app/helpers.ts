@@ -23,12 +23,14 @@ interface BufferObject {
 }
 
 export const bufferToBlob = (
-  buffer: BufferObject,
+  buffer: BufferObject | string,
   contentType: string = 'application/pdf',
 ): Blob => {
-  if (buffer.type === 'Buffer') {
-    const uint8Array = new Uint8Array(buffer.data); // Convert Buffer to Uint8Array
-    return new Blob([uint8Array], { type: contentType });
+  if (typeof buffer !== 'string') {
+    if (buffer.type === 'Buffer') {
+      const uint8Array = new Uint8Array(buffer.data); // Convert Buffer to Uint8Array
+      return new Blob([uint8Array], { type: contentType });
+    }
   }
   throw new Error('Invalid Buffer Object');
 };

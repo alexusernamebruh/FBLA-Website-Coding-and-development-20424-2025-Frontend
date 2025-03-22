@@ -12,6 +12,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { truncate } from '../helpers';
 import Modal from '../components/modal';
+import { IInterviewSlot, IJobPosting } from '../interfaces';
+import ChatsAndAnnouncements from '../components/chatsAndAnnouncements';
 
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState<number | null>(null);
@@ -65,23 +67,8 @@ export default function Home() {
     applicants: [],
   });
 
-  const [currentAppliedJobPosting, setCurrentAppliedJobPosting] = useState<{
-    id: number;
-    title: string;
-    description: string;
-    address: string;
-    createdAt: string;
-    author: { companyName: string; email: string; phoneNumber: string };
-    applicants: { username: string; id: number }[];
-  }>({
-    id: -1,
-    title: '...',
-    description: '...',
-    address: '',
-    createdAt: '...',
-    author: { companyName: '...', email: '', phoneNumber: '' },
-    applicants: [],
-  });
+  const [currentAppliedJobPosting, setCurrentAppliedJobPosting] =
+    useState<IJobPosting | null>();
 
   const [appliedJobPostings, setAppliedJobPostings] = useState([]);
 
@@ -133,7 +120,7 @@ export default function Home() {
       }
     }
   };
-  //still have mobile left to do
+
   const checkIfApplied = () => {
     let isApplied = false;
     for (let i = 0; i < currentJobPosting?.applicants?.length; i++) {
@@ -153,9 +140,7 @@ export default function Home() {
       }`,
     );
     setAppliedJobPostings(response.appliedPostings);
-    if (currentAppliedJobPosting?.id === -1) {
-      setCurrentAppliedJobPosting(response.appliedPostings[0]);
-    }
+    setCurrentAppliedJobPosting(response.appliedPostings[0]);
   };
 
   const getFilteredJobPostings = async (titleFilter: string) => {
@@ -167,6 +152,30 @@ export default function Home() {
     const selectedFile = event.target.files?.[0] || null;
     setResume(selectedFile);
     setResumeName(selectedFile?.name || '');
+  };
+
+  const applyToInterviewSlot = async (interviewSlotId: number) => {
+    const { data: response } = await a.put(
+      `/jobPostings/interviewSlots/${interviewSlotId}`,
+      { applicantId: +applicantId },
+    );
+
+    if (response) {
+      getAppliedJobPostings();
+      const { data: jobPosting } = await a.get(
+        `/jobPostings/${currentAppliedJobPosting?.id}`,
+      );
+      setCurrentAppliedJobPosting(jobPosting);
+    }
+  };
+
+  const checkIfAppliedToInterviewSlot = (interviewSlots: IInterviewSlot[]) => {
+    for (let i = 0; i < interviewSlots.length; i++) {
+      if (interviewSlots[i].applicantId === applicantId) {
+        return true;
+      }
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -286,7 +295,7 @@ export default function Home() {
           />
         </div>
         {currentPage === 'All Postings' && (
-          <div className='bg-grid w-full h-full min-h-screen flex flex-col'>
+          <div className='bg-grid w-full h-full overflow-auto flex flex-col'>
             <div className='grid w-full grid-cols-1'>
               <input
                 onChange={(v) => {
@@ -425,55 +434,38 @@ export default function Home() {
           </div>
         )}
         {currentPage === 'Applied Postings' && (
-          <div className='flex bg-grid w-full h-full min-h-screen p-8 space-x-4'>
+          <div className='flex bg-grid w-full h-full overflow-auto p-8 space-x-4'>
             <div className='flex flex-col space-y-4 w-fit overflow-auto'>
-              {appliedJobPostings?.map(
-                (
-                  v: {
-                    title: string;
-                    description: string;
-                    createdAt: string;
-                    address: string;
-                    author: {
-                      companyName: string;
-                      email: string;
-                      phoneNumber: string;
-                    };
-                    id: number;
-                    applicants: { username: string; id: number }[];
-                  },
-                  i,
-                ) => {
-                  return (
-                    <div key={i} className='group'>
-                      <div
-                        onClick={() => setCurrentAppliedJobPosting(v)}
-                        className='shadow-sm w-fit group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white h-fit rounded-lg border border-gray-300 px-8 py-6'
-                      >
-                        <div className='group-hover:cursor-pointer'>
-                          <p className='font-bold group-hover:underline'>
-                            {v.title}
-                          </p>
-                          <p className='font-medium mt-2 text-sm/6'>
-                            {truncate(v.description, 50)}
-                          </p>
-                          <p className='font-medium text-xs mt-2 text-gray-500'>
-                            {v.author?.companyName}
-                          </p>
-                          <p className='font-medium text-xs mt-1 text-gray-500'>
-                            Created on {dayjs(v.createdAt).format('MM/DD/YYYY')}{' '}
-                          </p>
-                          <p className='font-medium text-xs mt-1 text-gray-500'>
-                            {v.address || 'No address listed'}
-                          </p>
-                        </div>
+              {appliedJobPostings?.map((v: IJobPosting, i) => {
+                return (
+                  <div key={i} className='group'>
+                    <div
+                      onClick={() => setCurrentAppliedJobPosting(v)}
+                      className='shadow-sm w-fit group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white h-fit rounded-lg border border-gray-300 px-8 py-6'
+                    >
+                      <div className='group-hover:cursor-pointer'>
+                        <p className='font-bold group-hover:underline'>
+                          {v.title}
+                        </p>
+                        <p className='font-medium mt-2 text-sm/6'>
+                          {truncate(v.description, 50)}
+                        </p>
+                        <p className='font-medium text-xs mt-2 text-gray-500'>
+                          {v.author?.companyName}
+                        </p>
+                        <p className='font-medium text-xs mt-1 text-gray-500'>
+                          Created on {dayjs(v.createdAt).format('MM/DD/YYYY')}{' '}
+                        </p>
+                        <p className='font-medium text-xs mt-1 text-gray-500'>
+                          {v.address || 'No address listed'}
+                        </p>
                       </div>
                     </div>
-                  );
-                },
-              )}
+                  </div>
+                );
+              })}
             </div>
-            <div className='w-full h-full bg-white rounded-lg border border-gray-300 shadow-md'>
+            <div className='w-full h-full overflow-auto bg-white rounded-lg border border-gray-300 shadow-md'>
               <div className='border-b h-fit'>
                 <div className='px-6 py-6'>
                   <p className='font-bold text-2xl'>
@@ -533,6 +525,93 @@ export default function Home() {
                     {currentAppliedJobPosting?.description}
                   </p>
                 </div>
+                {currentAppliedJobPosting?.interviewSlots.length ? (
+                  <div className='space-y-1 px-6 py-8 border-t'>
+                    <p className='text-lg font-bold'>Interview</p>
+                    {checkIfAppliedToInterviewSlot(
+                      currentAppliedJobPosting?.interviewSlots,
+                    ) ? (
+                      <div className='space-y-2 flex flex-col'>
+                        <p className='text-sm text-gray-700'>
+                          Your interview information
+                        </p>
+                        <div className='bg-white flex justify-between border border-gray-300 p-4 rounded-md font-medium text-gray-600 text-xs'>
+                          <div className='flex flex-col space-y-1'>
+                            <p>
+                              Date:{' '}
+                              {dayjs(
+                                currentAppliedJobPosting?.interviewSlots.find(
+                                  (v) => v.applicantId === applicantId,
+                                )?.startTime,
+                              ).format('MM/DD/YYYY')}
+                            </p>
+                            <p>
+                              Start time:{' '}
+                              {dayjs(
+                                currentAppliedJobPosting?.interviewSlots.find(
+                                  (v) => v.applicantId === applicantId,
+                                )?.startTime,
+                              ).format('h:mm')}
+                            </p>
+                            <p>
+                              End time:{' '}
+                              {dayjs(
+                                currentAppliedJobPosting?.interviewSlots.find(
+                                  (v) => v.applicantId === applicantId,
+                                )?.endTime,
+                              ).format('h:mm')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='grid grid-cols-2 gap-x-2'>
+                        {currentAppliedJobPosting?.interviewSlots.map(
+                          (v: IInterviewSlot, i) => (
+                            <div
+                              key={i}
+                              className='bg-white flex justify-between border border-gray-300 p-4 rounded-md font-medium text-gray-600 text-xs'
+                            >
+                              <div className='flex flex-col space-y-1'>
+                                <p>
+                                  Date:{' '}
+                                  {dayjs(v.startTime).format('MM/DD/YYYY')}
+                                </p>
+                                <p>
+                                  Start time:{' '}
+                                  {dayjs(v.startTime).format('h:mm')}
+                                </p>
+                                <p>
+                                  End time: {dayjs(v.endTime).format('h:mm')}
+                                </p>
+                              </div>
+                              <div className='flex flex-col my-auto space-y-1'>
+                                <div
+                                  onClick={() => {
+                                    applyToInterviewSlot(
+                                      currentAppliedJobPosting.id,
+                                    );
+                                  }}
+                                  className='bg-blue-500 text-center hover:cursor-pointer text-xs text-white font-semibold rounded-md py-1 px-2 hover:bg-blue-600'
+                                >
+                                  Choose this interview
+                                </div>
+                              </div>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className='space-y-1 px-6 py-8 border-t'>
+                    <p className='text-lg font-bold'>Interview slots</p>
+                    <p className='text-sm text-gray-700'>
+                      Either you haven&apos;t been approved for an interview or
+                      there are no available interview slots yet
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -540,6 +619,11 @@ export default function Home() {
         {currentPage === 'Ai Helper' && (
           <div className='h-screen w-full'>
             <AIHelper userType={'APPLICANT'} />
+          </div>
+        )}
+        {currentPage === 'Chats & Announcements' && (
+          <div className='bg-grid bg-white h-screen w-full overflow-auto p-6'>
+            <ChatsAndAnnouncements userType={'Applicant'} />
           </div>
         )}
       </div>
@@ -616,55 +700,38 @@ export default function Home() {
             ))}
           {currentPage === 'Applied Postings' && (
             <div className='flex flex-col space-y-4 w-full overflow-auto'>
-              {appliedJobPostings?.map(
-                (
-                  v: {
-                    title: string;
-                    description: string;
-                    createdAt: string;
-                    address: string;
-                    author: {
-                      companyName: string;
-                      email: string;
-                      phoneNumber: string;
-                    };
-                    id: number;
-                    applicants: { username: string; id: number }[];
-                  },
-                  i,
-                ) => {
-                  return (
-                    <div key={i} className='group'>
-                      <div
-                        onClick={() => {
-                          setCurrentAppliedJobPosting(v);
-                          setCurrentPage('Selected Applied');
-                          setBackPage('Applied Postings');
-                        }}
-                        className='shadow-sm group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white w-full h-fit rounded-lg border border-gray-300 px-8 py-6'
-                      >
-                        <div className='group-hover:cursor-pointer'>
-                          <p className='font-bold group-hover:underline'>
-                            {v.title}
-                          </p>
-                          <p className='font-medium mt-2 text-sm/6'>
-                            {truncate(v.description, 50)}
-                          </p>
-                          <p className='font-medium text-xs mt-2 text-gray-500'>
-                            {v.author?.companyName}
-                          </p>
-                          <p className='font-medium text-xs mt-1 text-gray-500'>
-                            Created on {dayjs(v.createdAt).format('MM/DD/YYYY')}{' '}
-                          </p>
-                          <p className='font-medium text-xs mt-1 text-gray-500'>
-                            {v.address || 'No address listed'}
-                          </p>
-                        </div>
+              {appliedJobPostings?.map((v: IJobPosting, i) => {
+                return (
+                  <div key={i} className='group'>
+                    <div
+                      onClick={() => {
+                        setCurrentAppliedJobPosting(v);
+                        setCurrentPage('Selected Applied');
+                        setBackPage('Applied Postings');
+                      }}
+                      className='shadow-sm group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white w-full h-fit rounded-lg border border-gray-300 px-8 py-6'
+                    >
+                      <div className='group-hover:cursor-pointer'>
+                        <p className='font-bold group-hover:underline'>
+                          {v.title}
+                        </p>
+                        <p className='font-medium mt-2 text-sm/6'>
+                          {truncate(v.description, 50)}
+                        </p>
+                        <p className='font-medium text-xs mt-2 text-gray-500'>
+                          {v.author?.companyName}
+                        </p>
+                        <p className='font-medium text-xs mt-1 text-gray-500'>
+                          Created on {dayjs(v.createdAt).format('MM/DD/YYYY')}{' '}
+                        </p>
+                        <p className='font-medium text-xs mt-1 text-gray-500'>
+                          {v.address || 'No address listed'}
+                        </p>
                       </div>
                     </div>
-                  );
-                },
-              )}
+                  </div>
+                );
+              })}
             </div>
           )}
           {currentPage === 'Selected' && (

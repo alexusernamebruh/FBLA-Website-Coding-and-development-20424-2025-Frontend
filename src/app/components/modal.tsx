@@ -6,8 +6,8 @@ export default function Modal({
   setOpen,
   children,
 }: {
-  open: any;
-  setOpen: any;
+  open: boolean;
+  setOpen: (v: boolean) => void;
   children: ReactNode;
 }) {
   const cancelButtonRef = useRef(null);
@@ -16,7 +16,6 @@ export default function Modal({
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as='div'
-        //@ts-ignore
         className='relative z-10'
         initialFocus={cancelButtonRef}
         onClose={setOpen}

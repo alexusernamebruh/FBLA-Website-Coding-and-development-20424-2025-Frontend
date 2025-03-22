@@ -7,11 +7,12 @@ import MobileNavbar from '@/app/components/mobileNavbar';
 import SideNav from '@/app/components/sidenav';
 import dayjs from 'dayjs';
 import Success from '@/app/components/success';
-import { IApplication, IJobPosting } from '@/app/interfaces';
+import { IApplication, IInterviewSlot, IJobPosting } from '@/app/interfaces';
 import Modal from '@/app/components/modal';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import ChatsAndAnnouncements from '@/app/components/chatsAndAnnouncements';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -24,20 +25,15 @@ export default function Home() {
   const [newAddress, setNewAddress] = useState('');
   const [createSuccess, setCreateSuccess] = useState(false);
   const [jobPostings, setJobPostings] = useState<IJobPosting[]>([]);
-  const [currentJobPosting, setCurrentJobPosting] = useState<IJobPosting>({
-    id: -1,
-    title: '...',
-    description: '...',
-    address: '',
-    createdAt: '...',
-    author: { companyName: '...', email: '', phoneNumber: '' },
-    applicants: [],
-    postingStatus: 'OPEN',
-    status: 'PENDING',
-    applications: [],
-  });
+  const [currentJobPosting, setCurrentJobPosting] =
+    useState<IJobPosting | null>();
   const [backPage, setBackPage] = useState('Created Postings');
   const [showApplication, setShowApplication] = useState(false);
+  const [interviewSlots, setInterviewSlots] = useState<IInterviewSlot[]>([]);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [showCreateInterviewSlotModal, setShowCreateInterviewSlotModal] =
+    useState(false);
   const [selectedApplication, setSelectedApplication] =
     useState<IApplication | null>(null);
 
@@ -78,22 +74,57 @@ export default function Home() {
 
     setJobPostings(response);
 
-    if (currentJobPosting.id === -1) {
-      setCurrentJobPosting(response[0]);
-    }
+    setCurrentJobPosting(response[0]);
+    getInterviewSlots(response[0]?.id);
   };
 
   const changeJobPostingStatus = async (status: string) => {
-    const { data: response } = await a.put(
-      `/jobPostings/updateStatus/${currentJobPosting.id}?postingStatus=${status}`,
-    );
-    if (response) {
-      const { data: response2 } = await a.get(
-        `/jobPostings/${currentJobPosting.id}`,
+    if (currentJobPosting) {
+      const { data: response } = await a.put(
+        `/jobPostings/updateStatus/${currentJobPosting.id}?postingStatus=${status}`,
       );
-      setCurrentJobPosting(response2);
-      getJobPostings();
+      if (response) {
+        const { data: response2 } = await a.get(
+          `/jobPostings/${currentJobPosting.id}`,
+        );
+        setCurrentJobPosting(response2);
+        getJobPostings();
+      }
     }
+  };
+
+  const createInterviewSlot = async (
+    jobPostingId: number,
+    startTime: string,
+    endTime: string,
+  ) => {
+    setShowCreateInterviewSlotModal(false);
+    await a.post('/jobPostings/interviewSlots', {
+      jobPostingId: jobPostingId,
+      startTime: startTime,
+      endTime: endTime,
+    });
+    getInterviewSlots(jobPostingId);
+  };
+
+  const getInterviewSlots = async (jobPostingId: number) => {
+    const { data: response } = await a.get(
+      `/jobPostings/interviewSlots/${jobPostingId}`,
+    );
+    console.log(response);
+    setInterviewSlots(response);
+  };
+
+  const requestInterview = async (
+    jobPostingId: number,
+    applicantId: number,
+  ) => {
+    const { data: response } = await a.put(
+      `/jobPostings/interviewSlots/requestInterview/${jobPostingId}`,
+      { applicantId: applicantId },
+    );
+    getJobPostings();
+    setCurrentJobPosting(response);
   };
 
   useEffect(() => {
@@ -167,10 +198,12 @@ export default function Home() {
                 </div>
                 <div
                   onClick={() => {
-                    downloadBlob(
-                      bufferToBlob(selectedApplication?.resumeData),
-                      selectedApplication?.resumeName || 'resume.pdf',
-                    );
+                    if (selectedApplication?.resumeData !== undefined) {
+                      downloadBlob(
+                        bufferToBlob(selectedApplication?.resumeData),
+                        selectedApplication?.resumeName || 'resume.pdf',
+                      );
+                    }
                   }}
                   className='py-3 px-4 rounded-md w-fit text-white font-semibold bg-blue-500 hover:bg-blue-600 hover:cursor-pointer'
                 >
@@ -183,6 +216,43 @@ export default function Home() {
               <p className='text-sm text-gray-700 whitespace-pre-wrap'>
                 {dayjs(selectedApplication?.createdAt).format('MM/DD/YYYY')}
               </p>
+            </div>
+          </div>
+        </Modal>
+        <Modal
+          open={showCreateInterviewSlotModal}
+          setOpen={setShowCreateInterviewSlotModal}
+        >
+          <div className='flex flex-col space-y-4 p-4 w-full min-w-96'>
+            <p className='text-xl font-semibold mb-1'>Create Interview Slot</p>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>Start Time</p>
+              <input
+                type='datetime-local'
+                className='rounded-md px-3 py-1.5 border border-gray-300'
+                onChange={(v) => {
+                  setStartTime(v.target.value);
+                }}
+              />
+            </div>
+            <div className='flex flex-col'>
+              <p className='font-semibold'>End Time</p>
+              <input
+                type='datetime-local'
+                className='rounded-md px-3 py-1.5 border border-gray-300'
+                onChange={(v) => {
+                  setEndTime(v.target.value);
+                }}
+              />
+            </div>
+            <div
+              onClick={() =>
+                currentJobPosting?.id &&
+                createInterviewSlot(currentJobPosting.id, startTime, endTime)
+              }
+              className='bg-blue-500 w-fit hover:bg-blue-600 hover:cursor-pointer font-bold text-lg text-white rounded-md px-4 py-2'
+            >
+              Create Interview Slot
             </div>
           </div>
         </Modal>
@@ -211,7 +281,10 @@ export default function Home() {
                       return (
                         <div key={i} className='group'>
                           <div
-                            onClick={() => setCurrentJobPosting(v)}
+                            onClick={() => {
+                              setCurrentJobPosting(v);
+                              getInterviewSlots(v.id);
+                            }}
                             className='shadow-sm group-hover:cursor-pointer group-hover:shadow-md flex flex-col bg-white w-full h-fit rounded-lg border border-gray-300 px-8 py-6'
                           >
                             <div className='group-hover:cursor-pointer'>
@@ -337,6 +410,42 @@ export default function Home() {
                         {currentJobPosting?.description}
                       </p>
                     </div>
+                    <div className='space-y-1 px-6 py-8 border-b'>
+                      <p className='text-lg font-bold'>Interview Schedule</p>
+                      <div
+                        onClick={() => setShowCreateInterviewSlotModal(true)}
+                        className='bg-blue-500 hover:bg-blue-600 hover:cursor-pointer text-md font-semibold text-white rounded-md py-2 px-3.5 w-fit'
+                      >
+                        Create new interview slot
+                      </div>
+                      <div className='py-1 grid grid-flow-row grid-cols-2 gap-2 w-full h-full'>
+                        {interviewSlots.map((v: IInterviewSlot, i: number) => (
+                          <div
+                            key={i}
+                            className='bg-white flex justify-between border border-gray-300 p-4 rounded-md font-medium text-gray-600 text-xs'
+                          >
+                            <div className='flex flex-col space-y-1'>
+                              <p>
+                                {v?.applicant?.fullname || 'No applicant yet'}
+                              </p>
+                              <p>
+                                Starts{' '}
+                                {dayjs(v?.startTime).format('h:mm a, MM/DD/YY')}
+                              </p>
+                              <p>
+                                Ends{' '}
+                                {dayjs(v?.endTime).format('h:mm a, MM/DD/YY')}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        {interviewSlots.length === 0 && (
+                          <div className='font-medium text-sm text-gray-600'>
+                            No interview slots created yet
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <div className='space-y-1 px-6 py-8'>
                       <p className='text-lg font-bold mb-2'>Applications</p>
                       <div className='grid grid-cols-2 gap-x-2'>
@@ -344,18 +453,52 @@ export default function Home() {
                           currentJobPosting?.applications?.map((v, i) => (
                             <div
                               key={i}
-                              onClick={() => {
-                                setSelectedApplication(v);
-                                setShowApplication(true);
-                              }}
-                              className='bg-white hover:bg-gray-100 hover:cursor-pointer border border-gray-300 p-4 flex flex-col space-y-1 rounded-md font-medium text-gray-600 text-xs'
+                              className='bg-white flex justify-between border border-gray-300 p-4 rounded-md font-medium text-gray-600 text-xs'
                             >
-                              <p>{v.applicant.fullname}</p>
-                              <p>{v.applicant.email || 'No email listed'}</p>
-                              <p>
-                                {v.applicant.phoneNumber ||
-                                  'No phone number listed'}
-                              </p>
+                              <div className='flex flex-col space-y-1'>
+                                <p>{v.applicant.fullname}</p>
+                                <p>{v.applicant.email || 'No email listed'}</p>
+                                <p>
+                                  {v.applicant.phoneNumber ||
+                                    'No phone number listed'}
+                                </p>
+                              </div>
+                              <div className='flex flex-col my-auto space-y-1'>
+                                {currentJobPosting.applicantsCanInterview.find(
+                                  (e) => e.id === v.applicant.id,
+                                ) === undefined ? (
+                                  <div
+                                    onClick={() =>
+                                      requestInterview(
+                                        currentJobPosting?.id,
+                                        v?.applicant?.id,
+                                      )
+                                    }
+                                    className='bg-blue-500 text-center hover:cursor-pointer text-xs text-white font-semibold rounded-md py-1 px-2 hover:bg-blue-600'
+                                  >
+                                    Request Interview
+                                  </div>
+                                ) : interviewSlots.find(
+                                    (e) => e.applicantId === v?.applicant?.id,
+                                  ) === undefined ? (
+                                  <div className='text-center border hover:cursor-not-allowed text-xs text-gray-600 font-semibold rounded-md py-1 px-2'>
+                                    Interview requested
+                                  </div>
+                                ) : (
+                                  <div className='text-center border hover:cursor-not-allowed text-xs text-gray-600 font-semibold rounded-md py-1 px-2'>
+                                    Interview accepted
+                                  </div>
+                                )}
+                                <div
+                                  onClick={() => {
+                                    setSelectedApplication(v);
+                                    setShowApplication(true);
+                                  }}
+                                  className='bg-blue-500 text-center hover:cursor-pointer text-xs text-white font-semibold rounded-md py-1 px-2 hover:bg-blue-600'
+                                >
+                                  View Application
+                                </div>
+                              </div>
                             </div>
                           ))
                         ) : (
@@ -438,6 +581,11 @@ export default function Home() {
               </div>
             </div>
           )}
+          {currentPage === 'Chats & Announcements' && (
+            <div className='w-full h-full'>
+              <ChatsAndAnnouncements userType={'Employer'} />
+            </div>
+          )}
         </div>
       </div>
       {/* Desktop Ends here */}
@@ -463,6 +611,7 @@ export default function Home() {
                     <div
                       onClick={() => {
                         setCurrentJobPosting(v);
+                        getInterviewSlots(v.id);
                         setCurrentPage('Selected');
                         setBackPage('Created Postings');
                       }}

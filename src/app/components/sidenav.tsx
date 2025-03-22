@@ -3,6 +3,7 @@ import {
   ChatBubbleLeftEllipsisIcon,
   CheckBadgeIcon,
   EnvelopeIcon,
+  MegaphoneIcon,
   PlusCircleIcon,
   UserGroupIcon,
   XCircleIcon,
@@ -76,6 +77,23 @@ export default function SideNav({
               </div>
               <p>Ai Helper</p>
             </div>
+            <div
+              className={`${
+                current == 'Chats & Announcements'
+                  ? 'bg-blue-600 hover:cursor-pointer space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+                  : 'bg-blue-500 hover:cursor-pointer text-blue-200 hover:text-white hover:bg-blue-600 space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+              }`}
+              onClick={() => {
+                if (current !== 'Chats & Announcements') {
+                  setCurrent('Chats & Announcements');
+                }
+              }}
+            >
+              <div className='w-5 h-5'>
+                <MegaphoneIcon />
+              </div>
+              <p>Chats & Announcements</p>
+            </div>
           </div>
         )}
         {type === 'employer' && (
@@ -113,6 +131,23 @@ export default function SideNav({
                 <PlusCircleIcon />
               </div>
               <p>Create a posting</p>
+            </div>
+            <div
+              className={`${
+                current == 'Chats & Announcements'
+                  ? 'bg-blue-600 hover:cursor-pointer space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+                  : 'bg-blue-500 hover:cursor-pointer text-blue-200 hover:text-white hover:bg-blue-600 space-x-2 px-2 py-2.5 items-center rounded-md text-left flex'
+              }`}
+              onClick={() => {
+                if (current !== 'Chats & Announcements') {
+                  setCurrent('Chats & Announcements');
+                }
+              }}
+            >
+              <div className='w-5 h-5'>
+                <MegaphoneIcon />
+              </div>
+              <p>Chats & Announcements</p>
             </div>
           </div>
         )}

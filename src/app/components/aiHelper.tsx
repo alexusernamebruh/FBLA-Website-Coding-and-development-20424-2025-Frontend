@@ -1,7 +1,6 @@
+'use client';
 import {
   ChatBubbleLeftEllipsisIcon,
-  EllipsisHorizontalCircleIcon,
-  EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
@@ -135,7 +134,7 @@ export default function AIHelper({ userType }: { userType: string }) {
 
   const deleteChat = async () => {
     setShowDeleteChatWarning(false);
-    const { data: response } = await a.delete(`/ai/${chat.id}`);
+    await a.delete(`/ai/${chat.id}`);
     setSelected('New Chat');
     getChats();
   };

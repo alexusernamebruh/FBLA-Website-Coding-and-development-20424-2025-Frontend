@@ -15,6 +15,8 @@ export interface IJobPosting {
   postingStatus: string;
   status: string;
   applications: IApplication[];
+  applicantsCanInterview: IApplicant[];
+  interviewSlots: IInterviewSlot[];
 }
 
 export interface IApplication {
@@ -42,6 +44,16 @@ export interface IApplicant {
   applications: IApplication[];
 }
 
+export interface IInterviewSlot {
+  id: number;
+  startTime: string;
+  endTime: string;
+  jobPostingId: number;
+  jobPosting: IJobPosting;
+  applicantId: number;
+  applicant: IApplicant;
+}
+
 export interface IChat {
   id: number;
   content: IChatContent[];
@@ -52,4 +64,35 @@ export interface IChat {
 export interface IChatContent {
   role: string;
   content: string;
+}
+
+export interface IEmployerAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  employerId: number;
+  createdAt: string;
+  announceTo: string;
+  jobPosting: IJobPosting;
+  jobPostingId: number;
+  employer: IEmployer;
+}
+
+export interface IEmployer {
+  id: number;
+  email?: string;
+  companyName: string;
+  username: string;
+  phoneNumber?: string;
+  jobPostings: IJobPosting[];
+  employerAnnouncements: IEmployerAnnouncement[];
+}
+
+export interface IEmployerApplicantChat {
+  id: number;
+  content: string;
+  employerId: number;
+  employer: IEmployer;
+  applicant: IApplicant;
+  applicantId: number;
 }
