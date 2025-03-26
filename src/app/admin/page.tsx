@@ -40,39 +40,9 @@ export default function Home() {
   const [declinedJobPostings, setDeclinedJobPostings] = useState<IJobPosting[]>(
     [],
   );
-  const [selectedPending, setSelectedPending] = useState<IJobPosting>({
-    id: -1,
-    title: '...',
-    description: '...',
-    address: '',
-    createdAt: '...',
-    author: { companyName: '...', email: '', phoneNumber: '' },
-    applicants: [],
-    postingStatus: 'OPEN',
-    status: 'PENDING',
-  });
-  const [selectedAccepted, setSelectedAccepted] = useState<IJobPosting>({
-    id: -1,
-    title: '...',
-    description: '...',
-    address: '',
-    createdAt: '...',
-    author: { companyName: '...', email: '', phoneNumber: '' },
-    applicants: [],
-    postingStatus: 'OPEN',
-    status: 'PENDING',
-  });
-  const [selectedDeclined, setSelectedDeclined] = useState<IJobPosting>({
-    id: -1,
-    title: '...',
-    description: '...',
-    address: '',
-    createdAt: '...',
-    author: { companyName: '...', email: '', phoneNumber: '' },
-    applicants: [],
-    postingStatus: 'OPEN',
-    status: 'PENDING',
-  });
+  const [selectedPending, setSelectedPending] = useState<IJobPosting>();
+  const [selectedAccepted, setSelectedAccepted] = useState<IJobPosting>();
+  const [selectedDeclined, setSelectedDeclined] = useState<IJobPosting>();
   const [newEmployerUsername, setNewEmployerUsername] = useState('');
   const [newEmployerPassword, setNewEmployerPassword] = useState('');
   const [newEmployerCompanyName, setNewEmployerCompanyName] = useState('');
@@ -94,9 +64,7 @@ export default function Home() {
       '/jobPostings/admin/getJobPostingsForAdmin?status=PENDING',
     );
     setPendingJobPostings(response);
-    if (selectedPending.id === -1) {
-      setSelectedPending(response[0]);
-    }
+    setSelectedPending(response[0]);
   };
 
   const getAcceptedJobPostings = async () => {
@@ -104,9 +72,7 @@ export default function Home() {
       '/jobPostings/admin/getJobPostingsForAdmin?status=ACCEPTED',
     );
     setAcceptedJobPostings(response);
-    if (selectedPending.id === -1) {
-      setSelectedAccepted(response[0]);
-    }
+    setSelectedAccepted(response[0]);
   };
 
   const getDeclinedJobPostings = async () => {
@@ -114,9 +80,7 @@ export default function Home() {
       '/jobPostings/admin/getJobPostingsForAdmin?status=DECLINED',
     );
     setDeclinedJobPostings(response);
-    if (selectedPending.id === -1) {
-      setSelectedDeclined(response[0]);
-    }
+    setSelectedDeclined(response[0]);
   };
 
   const approveJobPosting = async (jobPostingId: number) => {
@@ -313,7 +277,8 @@ export default function Home() {
                         <div className='space-x-2 flex'>
                           <div
                             onClick={() =>
-                              approveJobPosting(+selectedPending?.id)
+                              selectedPending?.id !== undefined &&
+                              approveJobPosting(+selectedPending.id)
                             }
                             className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-green-500 hover:cursor-pointer hover:bg-green-600 text-white font-bold text-center'
                           >
@@ -321,7 +286,8 @@ export default function Home() {
                           </div>
                           <div
                             onClick={() =>
-                              declineJobPosting(+selectedPending?.id)
+                              selectedPending?.id !== undefined &&
+                              declineJobPosting(+selectedPending.id)
                             }
                             className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-red-500 hover:cursor-pointer hover:bg-red-600 text-white font-bold text-center'
                           >
@@ -429,7 +395,8 @@ export default function Home() {
                         <div className='space-x-2 flex'>
                           <div
                             onClick={() =>
-                              declineJobPosting(+selectedAccepted?.id)
+                              selectedAccepted?.id !== undefined &&
+                              declineJobPosting(+selectedAccepted.id)
                             }
                             className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-red-500 hover:cursor-pointer hover:bg-red-600 text-white font-bold text-center'
                           >
@@ -537,7 +504,8 @@ export default function Home() {
                         <div className='space-x-2 flex'>
                           <div
                             onClick={() =>
-                              approveJobPosting(+selectedPending?.id)
+                              selectedPending?.id !== undefined &&
+                              approveJobPosting(+selectedPending.id)
                             }
                             className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-green-500 hover:cursor-pointer hover:bg-green-600 text-white font-bold text-center'
                           >
@@ -795,7 +763,8 @@ export default function Home() {
                       <div className='space-x-2 flex'>
                         <div
                           onClick={() => {
-                            approveJobPosting(+selectedPending?.id);
+                            selectedPending?.id !== undefined &&
+                              approveJobPosting(+selectedPending.id);
                             setCurrentPage('Pending Job Postings');
                           }}
                           className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-green-500 hover:cursor-pointer hover:bg-green-600 text-white font-bold text-center'
@@ -804,7 +773,8 @@ export default function Home() {
                         </div>
                         <div
                           onClick={() => {
-                            declineJobPosting(+selectedPending?.id);
+                            selectedPending?.id !== undefined &&
+                              declineJobPosting(+selectedPending.id);
                             setCurrentPage('Pending Job Postings');
                           }}
                           className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-red-500 hover:cursor-pointer hover:bg-red-600 text-white font-bold text-center'
@@ -923,7 +893,8 @@ export default function Home() {
                       <div className='space-x-2 flex'>
                         <div
                           onClick={() => {
-                            declineJobPosting(+selectedAccepted?.id);
+                            selectedAccepted?.id !== undefined &&
+                              declineJobPosting(+selectedAccepted.id);
                             setCurrentPage('Accepted Job Postings');
                           }}
                           className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-red-500 hover:cursor-pointer hover:bg-red-600 text-white font-bold text-center'
@@ -1043,7 +1014,8 @@ export default function Home() {
                       <div className='space-x-2 flex'>
                         <div
                           onClick={() => {
-                            approveJobPosting(+selectedPending?.id);
+                            selectedPending?.id !== undefined &&
+                              approveJobPosting(+selectedPending.id);
                             setCurrentPage('Declined Job Postings');
                           }}
                           className='w-fit h-fit px-4 py-2 mt-4 rounded-md bg-green-500 hover:cursor-pointer hover:bg-green-600 text-white font-bold text-center'
@@ -1229,56 +1201,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* {authenticated === false ? (
-        <div className='mx-auto my-auto min-w-[25%]'>
-          <div>
-            <div className='flex items-center justify-between'>
-              <label
-                htmlFor='password'
-                className='block text-sm/6 font-bold text-gray-900'
-              >
-                Password*
-              </label>
-            </div>
-            <div className='mt-2'>
-              <input
-                id='password'
-                name='password'
-                type='password'
-                required
-                onChange={(v) => setPassword(v.target.value)}
-                value={password}
-                className='block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6'
-              />
-            </div>
-          </div>
-          <div
-            onClick={() => authenticate()}
-            className='bg-blue-500 text-center mt-2 hover:bg-blue-600 hover:cursor-pointer text-white font-semibold rounded-md px-3 py-2'
-          >
-            Submit
-          </div>
-        </div>
-      ) : (
-        <div>
-          {/* Desktop Starts here */}
-      {/* <div
-        className={`bg-white h-screen w-full ${
-          windowWidth > 1023 ? 'flex' : 'hidden'
-        }`}
-      ></div> */}
-      {/* Desktop Ends here */}
-
-      {/* Mobile Starts here */}
-      {/* <div
-            className={`${
-              windowWidth < 1025 ? 'flex flex-col' : 'hidden'
-            } h-screen`}
-          ></div> */}
-      {/* Mobile Ends here */}
-      {/* </div> */}
-      {/* )} */}
     </div>
   );
 }

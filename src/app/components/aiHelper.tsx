@@ -225,7 +225,7 @@ export default function AIHelper({ userType }: { userType: string }) {
                       createChat();
                     }
                   }}
-                  placeholder='Recommend me a job based on...'
+                  placeholder='Recommend me a job about...'
                   className='col-start-1 row-start-1 rounded-md block focus:outline-none w-full bg-white py-4 pl-10 pr-3 text-base text-gray-900 placeholder:text-gray-400'
                 />
                 <ChatBubbleLeftEllipsisIcon

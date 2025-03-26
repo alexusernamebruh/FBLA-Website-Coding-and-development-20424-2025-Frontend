@@ -96,3 +96,10 @@ export interface IEmployerApplicantChat {
   applicant: IApplicant;
   applicantId: number;
 }
+
+export interface IEmployerApplicantChatContent {
+  messageContent: string;
+  senderId: number;
+  senderType: string;
+  createdAt: string;
+}

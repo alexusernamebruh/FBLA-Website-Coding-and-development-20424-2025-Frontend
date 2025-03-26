@@ -17,7 +17,7 @@ export default function Footer() {
             <div className=''>
               <div>
                 <h3 className='text-lg font-semibold text-gray-900'>Contact</h3>
-                <ul role='list' className='mt-6 space-y-4'>
+                <ul role='list' className='mt-6 space-y-4 font-semibold'>
                   {navigation.contact.map((item) => (
                     <li key={item.name} className='text-md'>
                       {item.name}

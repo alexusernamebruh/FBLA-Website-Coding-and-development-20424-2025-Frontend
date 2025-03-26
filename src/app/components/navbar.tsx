@@ -9,6 +9,9 @@ export default function Navbar() {
         <a href='/login' className='font-bold hover:cursor-pointer'>
           Log In
         </a>
+        <a href='/userGuide' className='font-bold hover:cursor-pointer'>
+          User Guide
+        </a>
       </div>
     </div>
   );

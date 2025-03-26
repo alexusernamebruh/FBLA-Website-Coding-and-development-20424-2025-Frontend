@@ -25,7 +25,7 @@ export default function Home() {
           <div className='w-full h-full pb-4'>
             <Navbar />
           </div>
-          <div className='w-full h-full bg-grid bg-white rounded-lg shadow mb-4'>
+          <div className='flex flex-col w-full h-full bg-grid bg-white rounded-lg shadow mb-4'>
             <div className='flex w-full h-full space-x-6 px-14 items-center py-16 '>
               <div className='text-left w-1/2 flex flex-col space-y-3 h-full'>
                 <div className='space-y-3 h-full flex flex-col justify-center'>
@@ -58,6 +58,43 @@ export default function Home() {
                 />
               </div>
             </div>
+
+            <div className='text-center flex space-y-3 w-full h-full space-x-6 px-14 items-center py-16'>
+              <div className='flex my-auto w-1/2'>
+                <div className='p-6 bg-blue-50 rounded-xl'>
+                  <img
+                    src='https://cdn.pixabay.com/photo/2021/02/09/21/01/computer-5999978_1280.jpg'
+                    className='rounded-xl'
+                  />
+                </div>
+              </div>
+
+              <div className='space-y-3 w-1/2 h-full flex flex-col justify-center'>
+                <p className='font-bold text-6xl'>Feature-Rich</p>
+                <div className='text-gray-600'>
+                  <p className='font-bold text-xl'>
+                    There are many tools to help you!
+                  </p>
+                  <p className='font-bold text-md pt-4'>
+                    You can apply for job postings, view announcements, and chat
+                    with employers
+                  </p>
+                  <p className='font-bold text-md pt-4'>
+                    There is also an AI helper that will help you with your
+                    application so you can be the best you can!
+                  </p>
+                </div>
+
+                <div></div>
+                <a
+                  href='/userGuide'
+                  className='bg-blue-500 mx-auto hover:bg-blue-600 px-4 py-2 text-white hover:cursor-pointer rounded-lg w-fit font-bold'
+                >
+                  See User Guide
+                </a>
+              </div>
+            </div>
+
             <Footer />
           </div>
         </div>

@@ -8,8 +8,10 @@ import {
   IEmployer,
   IEmployerAnnouncement,
   IEmployerApplicantChat,
+  IEmployerApplicantChatContent,
   IJobPosting,
 } from '../interfaces';
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/react/24/outline';
 
 export default function ChatsAndAnnouncements({
   userType,
@@ -17,6 +19,7 @@ export default function ChatsAndAnnouncements({
   userType: string;
 }) {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const [selected, setSelected] = useState('Announcements');
   const [showCreateAnnouncement, setShowCreateAnnouncement] = useState(false);
   const [newAnnouncementTitle, setNewAnnouncementTitle] = useState('');
@@ -79,7 +82,6 @@ export default function ChatsAndAnnouncements({
         JSON.parse(localStorage.getItem('Applicant')!).applicantId
       }`,
     );
-    console.log(result);
     setAnnouncementsApplicantCanView(result);
   };
 
@@ -102,9 +104,8 @@ export default function ChatsAndAnnouncements({
       employerId: selectedEmployer?.id,
       applicantId: JSON.parse(localStorage.getItem('Applicant')!).applicantId,
     });
-
-    setSelected('Chat');
     setSelectedChat(result);
+    setSelected('Chat');
     setShowCreateChat(false);
   };
 
@@ -114,6 +115,11 @@ export default function ChatsAndAnnouncements({
         JSON.parse(localStorage.getItem('Applicant')!).applicantId
       }`,
     );
+    if (selectedChat) {
+      setSelectedChat(
+        result.find((e: { id: number }) => e.id === selectedChat?.id),
+      );
+    }
     setChats(result);
   };
 
@@ -123,49 +129,78 @@ export default function ChatsAndAnnouncements({
         JSON.parse(localStorage.getItem('Employer')!).id
       }`,
     );
+    if (selectedChat) {
+      setSelectedChat(
+        result.find((e: { id: number }) => e.id === selectedChat?.id),
+      );
+    }
+
     setChats(result);
   };
 
   const sendChatMessage = async () => {
-    const { data: result } = await a.put(
-      `/chats/sendMessage/${selectedChat?.id}`,
-      {
-        message: message,
-        senderId:
-          userType === 'Applicant'
-            ? JSON.parse(localStorage.getItem('Applicant')!).applicantId
-            : JSON.parse(localStorage.getItem('Employer')!).id,
-        senderType: userType,
-      },
-    );
-    setSelectedChat(result);
+    if (message !== '') {
+      const { data: result } = await a.put(
+        `/chats/sendMessage/${selectedChat?.id}`,
+        {
+          message: message,
+          senderId:
+            userType === 'Applicant'
+              ? JSON.parse(localStorage.getItem('Applicant')!).applicantId
+              : JSON.parse(localStorage.getItem('Employer')!).id,
+          senderType: userType,
+        },
+      );
+      setSelectedChat(result);
+      setMessage('');
 
-    // const currentChats = chats;
-    // const selectedChatIndex = currentChats.findIndex(
-    //   (e) => e.id === selectedChat?.id,
-    // );
-    // currentChats.splice(selectedChatIndex, 1, result);
-    // setChats(currentChats);
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
 
-    userType === 'Applicant' ? getChatsForApplicant() : getChatsForEmployer();
+      if (userType === 'Applicant') {
+        getChatsForApplicant();
+      } else {
+        getChatsForEmployer();
+      }
+    }
+  };
+
+  const adjustHeight = () => {
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
   };
 
   useEffect(() => {
-    getJobPostings();
-    getCreatedAnnouncements();
-    getAnnouncementsApplicantCanView();
     getAllEmployers('');
-    userType === 'Applicant' ? getChatsForApplicant() : getChatsForEmployer();
-  }, []);
+    if (userType === 'Applicant') {
+      getAnnouncementsApplicantCanView();
+      getChatsForApplicant();
+    } else {
+      getChatsForEmployer();
+      getJobPostings();
+      getCreatedAnnouncements();
+    }
+  }, [userType]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedChat]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      userType === 'Applicant' ? getChatsForApplicant() : getChatsForEmployer();
-    }, 1000);
+      if (userType === 'Applicant') {
+        getChatsForApplicant();
+      } else {
+        getChatsForEmployer();
+      }
+    }, 3000);
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [selectedChat]);
 
   useEffect(() => {
     return () => {
@@ -381,34 +416,87 @@ export default function ChatsAndAnnouncements({
               <div className='flex flex-col w-full h-full'>
                 <div className='border-b flex justify-between items-center py-4 px-4'>
                   <p className='text-lg font-semibold'>
-                    Chat with {selectedChat?.employer.companyName}
+                    Chat with {selectedChat?.employer?.companyName}
                   </p>
                 </div>
-                <div className='mt-6 overflow-auto scrollbar-hide h-full space-y-16 py-8 w-full'>
-                              {selectedChat.content.map((content: IChatContent, i: number) => (
-                                <div key={i} className='w-full'>
-                                  <div
-                                    className={`text-md whitespace-pre-line font-medium max-w-[75%] py-2 px-3 w-fit rounded-md ${
-                                      content.role === 'ai'
-                                        ? 'mr-auto bg-gray-100'
-                                        : 'ml-auto bg-blue-100'
-                                    }`}
-                                  >
-                                    <ReactMarkdown>{content.content.toString()}</ReactMarkdown>
-                                  </div>
-                                </div>
-                              ))}
-                
-                              {responseLoading && (
-                                <div className='py-4 px-3 bg-gray-100 w-fit space-x-1 rounded-md flex'>
-                                  <div className='rounded-full w-3 h-3 animate-pulse bg-gray-400' />
-                                  <div className='rounded-full w-3 h-3 animate-pulse bg-gray-400' />
-                                  <div className='rounded-full w-3 h-3 animate-pulse bg-gray-400' />
-                                </div>
-                              )}
-                
-                              <div ref={chatEndRef} />
-                            </div>iv></div>
+                <div className='mt-6 overflow-auto scrollbar-hide h-full px-6 space-y-4 py-8 w-full'>
+                  {JSON.parse(selectedChat?.content ?? '[]').length ? (
+                    JSON.parse(selectedChat?.content ?? '[]').map(
+                      (content: IEmployerApplicantChatContent, i: number) => (
+                        <div key={i} className='w-full flex flex-col'>
+                          <div
+                            className={`whitespace-pre-wrap text-base font-medium max-w-[75%] py-2 px-3 w-fit rounded-md ${
+                              content.senderType === 'Employer'
+                                ? 'mr-auto bg-gray-100'
+                                : 'ml-auto bg-blue-100'
+                            }`}
+                          >
+                            {content.messageContent}
+                          </div>
+                        </div>
+                      ),
+                    )
+                  ) : (
+                    <div className='text-xl mx-auto font-semibold my-auto'>
+                      No messages have been sent yet
+                    </div>
+                  )}
+
+                  <div ref={chatEndRef} />
+                </div>
+                <div className='p-6'>
+                  <div className='mt-auto border border-gray-300 rounded-md'>
+                    <div className='w-full flex items-start'>
+                      <div className='h-full flex mt-[1.15rem] mb-4 flex-col justify-start'>
+                        <ChatBubbleLeftEllipsisIcon
+                          aria-hidden='true'
+                          className='pointer-events-none col-start-1 row-start-1 ml-3 size-5 text-gray-400'
+                        />
+                      </div>
+                      <textarea
+                        ref={inputRef}
+                        onChange={(v) => {
+                          setMessage(v.target.value);
+                          adjustHeight();
+                        }}
+                        value={message}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            sendChatMessage();
+                          }
+                          if (e.key === 'Tab') {
+                            e.preventDefault();
+
+                            const start = (e.target as HTMLTextAreaElement)
+                              .selectionStart;
+                            const end = (e.target as HTMLTextAreaElement)
+                              .selectionEnd;
+
+                            const newValue =
+                              message.slice(0, start) +
+                              '\t' +
+                              message.slice(end);
+
+                            setMessage(newValue);
+
+                            setTimeout(() => {
+                              (e.target as HTMLTextAreaElement).selectionStart =
+                                (e.target as HTMLTextAreaElement).selectionEnd =
+                                  start + 1;
+                            }, 0);
+                          }
+                        }}
+                        rows={1}
+                        placeholder='Respond to a question'
+                        className='col-start-1 resize-none overflow-hidden row-start-1 rounded-md block focus:outline-none w-full bg-white py-4 px-2.5 text-base text-gray-900 placeholder:text-gray-400'
+                        style={{
+                          overflowY: 'hidden',
+                          lineHeight: '1.5',
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             {selected === 'Announcements' && (
@@ -489,8 +577,86 @@ export default function ChatsAndAnnouncements({
               <div className='flex flex-col w-full h-full'>
                 <div className='border-b flex justify-between items-center py-4 px-4'>
                   <p className='text-lg font-semibold'>
-                    Chat with {selectedChat?.applicant.fullname}
+                    Chat with {selectedChat?.applicant?.fullname}
                   </p>
+                </div>
+                <div className='mt-6 overflow-auto scrollbar-hide h-full px-6 space-y-4 py-8 w-full'>
+                  {JSON.parse(selectedChat?.content ?? '[]').length ? (
+                    JSON.parse(selectedChat?.content ?? '[]').map(
+                      (content: IEmployerApplicantChatContent, i: number) => (
+                        <div key={i} className='w-full flex flex-col'>
+                          <div
+                            className={`whitespace-pre-wrap text-base font-medium max-w-[75%] py-2 px-3 w-fit rounded-md ${
+                              content.senderType === 'Applicant'
+                                ? 'mr-auto bg-gray-100'
+                                : 'ml-auto bg-blue-100'
+                            }`}
+                          >
+                            {content.messageContent}
+                          </div>
+                        </div>
+                      ),
+                    )
+                  ) : (
+                    <div className='text-xl mx-auto font-semibold my-auto'>
+                      No messages have been sent yet
+                    </div>
+                  )}
+
+                  <div ref={chatEndRef} />
+                </div>
+                <div className='p-6'>
+                  <div className='mt-auto border border-gray-300 rounded-md'>
+                    <div className='w-full flex items-start'>
+                      <div className='h-full flex mt-[1.15rem] mb-4 flex-col justify-start'>
+                        <ChatBubbleLeftEllipsisIcon
+                          aria-hidden='true'
+                          className='pointer-events-none col-start-1 row-start-1 ml-3 size-5 text-gray-400'
+                        />
+                      </div>
+                      <textarea
+                        ref={inputRef}
+                        onChange={(v) => {
+                          setMessage(v.target.value);
+                          adjustHeight();
+                        }}
+                        value={message}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            sendChatMessage();
+                          }
+                          if (e.key === 'Tab') {
+                            e.preventDefault();
+
+                            const start = (e.target as HTMLTextAreaElement)
+                              .selectionStart;
+                            const end = (e.target as HTMLTextAreaElement)
+                              .selectionEnd;
+
+                            const newValue =
+                              message.slice(0, start) +
+                              '\t' +
+                              message.slice(end);
+
+                            setMessage(newValue);
+
+                            setTimeout(() => {
+                              (e.target as HTMLTextAreaElement).selectionStart =
+                                (e.target as HTMLTextAreaElement).selectionEnd =
+                                  start + 1;
+                            }, 0);
+                          }
+                        }}
+                        rows={1}
+                        placeholder='Respond to a question'
+                        className='col-start-1 resize-none overflow-hidden row-start-1 rounded-md block focus:outline-none w-full bg-white py-4 px-2.5 text-base text-gray-900 placeholder:text-gray-400'
+                        style={{
+                          overflowY: 'hidden',
+                          lineHeight: '1.5',
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
