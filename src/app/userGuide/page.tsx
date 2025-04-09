@@ -12,7 +12,7 @@ export default function UserGuide() {
   return (
     <div className='w-full h-full min-h-screen min-w-screen flex'>
       {/* Sidenav starts */}
-      <div className='bg-blue-500 w-fit overflow-hidden h-screen max-h-screen'>
+      <div className='bg-blue-500 px-3 w-fit overflow-hidden h-screen max-h-screen'>
         <div className='flex flex-col text-white space-y-2 items-center rounded-lg px-8 h-full py-8'>
           <p className='font-bold mb-2'>Guide for {selected}</p>
           <div className='flex flex-col space-y-1 font-semibold text-sm w-[15rem]'>
@@ -85,17 +85,16 @@ export default function UserGuide() {
                   1. A job posting is created by an employer who is looking for
                   hires.
                 </p>
-                <p>2. Applicants will apply to job postings.</p>
+                <p>2. You will apply to job postings.</p>
                 <p>
-                  3. Each applicant's application will be reviewed by the
-                  employer, and the employer will select some applicants to move
-                  on to interviews.
+                  3. Your application will be reviewed by the employer, and the
+                  employer will select some applicants to move on to interviews.
                 </p>
                 <div className='flex flex-col'>
                   <p>
-                    4. Applicants selected for interviews will pick an interview
-                    time from a interview slot list that an employer has
-                    created.
+                    4. If you are selected for an interview, you will pick an
+                    interview time from a interview slot list that an employer
+                    has created.
                   </p>
                   <p className='ml-4'>
                     Note: Interview slots are first come, first serve.
@@ -192,6 +191,11 @@ export default function UserGuide() {
                   </p>
                 </div>
                 <p>5. Applicants will sign up for interview slots.</p>
+                <p>
+                  6. After you have interviewed all interviewees and hired
+                  someone, you should close your job posting to new
+                  applications.
+                </p>
               </div>
             </div>
             <div className='rounded-md shadow border w-full h-full bg-white flex flex-col'>

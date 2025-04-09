@@ -20,7 +20,6 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const Login = async () => {
     const { data: response } = await a.post('/employers/signIn', {

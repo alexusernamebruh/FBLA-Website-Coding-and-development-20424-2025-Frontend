@@ -22,7 +22,6 @@ export default function Home() {
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const signup = async () => {
     const { data: response } = await a.post('/applicants', {

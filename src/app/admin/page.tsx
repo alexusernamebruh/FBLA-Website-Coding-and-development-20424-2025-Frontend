@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -220,7 +219,7 @@ export default function Home() {
               windowWidth > 1023 ? 'flex' : 'hidden'
             }`}
           >
-            <div className='bg-blue-500 w-fit'>
+            <div className='bg-blue-500 w-fit h-full min-h-screen'>
               <SideNav
                 current={currentPage}
                 setCurrent={setCurrentPage}
@@ -564,7 +563,7 @@ export default function Home() {
               </div>
             )}
             {currentPage === 'Create Employer' && (
-              <div className='w-full h-full m-8 bg-white flex flex-col rounded-lg border border-gray-300 shadow-md'>
+              <div className='w-full mx-8 my-8 bg-white flex flex-col rounded-lg border border-gray-300 shadow-md'>
                 <div className='border-b h-fit'>
                   <div className='px-6 py-6'>
                     <p className='font-bold text-2xl'>

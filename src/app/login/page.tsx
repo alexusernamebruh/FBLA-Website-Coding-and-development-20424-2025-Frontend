@@ -20,7 +20,6 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const Login = async () => {
     const { data: response } = await a.post('/applicants/signIn', {
@@ -110,12 +109,6 @@ export default function Home() {
       )}
       {windowWidth < 1024 && (
         <div className='flex flex-col min-h-screen h-full bg-white'>
-          {/* <div className='h-screen w-1/2'>
-            <img
-              src='https://images.pexels.com/photos/375889/pexels-photo-375889.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-              className='w-full h-full object-cover'
-            />
-          </div> */}
           <div className='h-screen w-full bg-grid'>
             <div className='mx-auto h-full max-w-[30rem] w-full my-auto'>
               <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8'>
